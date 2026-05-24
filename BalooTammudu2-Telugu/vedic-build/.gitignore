@@ -1,0 +1,10 @@
+# Donor font tree — unpacked Noto Sans Devanagari release (~45MB)
+donor/
+
+# Intermediate TTFs compiled from ../TTX as graft input
+intermediate/
+
+# Ephemeral artifacts from the GitHub issue-draft step
+make_issue_url.py
+issue-body.md
+issue-prefilled-url.txt

@@ -1,5 +1,13 @@
 ﻿Copyright (c) 2019 Ek Type (www.ektype.in)
 
+Portions of Baloo Tammudu 2 covering Vedic accent marks - the Unicode Vedic
+Extensions block (U+1CD0-U+1CFF) and the Devanagari-block Vedic accents
+(U+0951-U+0954) - are derived from Noto Sans Devanagari:
+Copyright 2022 The Noto Project Authors (https://github.com/notofonts/devanagari)
+Licensed under the SIL Open Font License, Version 1.1.
+"Noto" is a trademark of Google Inc. and is not used in any Baloo Tammudu 2
+font name; the trademark is acknowledged here per OFL Section 4.
+
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL
