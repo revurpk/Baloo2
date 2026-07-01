@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<title>Baloo Tammudu 2 Vedic — demo</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  :root {
+    color-scheme: light dark;
+    --fg: #111;
+    --muted: #666;
+    --border: #ddd;
+    --bg: #fff;
+    --sample-bg: #fafafa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --fg: #eee; --muted: #999; --border: #333; --bg: #111; --sample-bg: #1a1a1a; }
+  }
+  body {
+    font-family: 'Baloo Tammudu 2 Vedic', system-ui, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.5rem 4rem;
+    line-height: 1.5;
+  }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 2rem; }
+  h1 { font-weight: 800; margin: 0 0 .25rem; font-size: 2rem; }
+  header p { color: var(--muted); margin: 0; font-size: .95rem; }
+  section { margin: 2rem 0; }
+  h2 { font-weight: 700; font-size: 1.25rem; margin: 0 0 .5rem; }
+  h2 small { color: var(--muted); font-weight: 500; font-size: .85rem; margin-left: .5rem; }
+  .sample {
+    background: var(--sample-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: .5rem 0;
+  }
+  .te { font-size: 2rem; line-height: 1.3; }
+  .label { color: var(--muted); font-size: .85rem; margin-top: .25rem; }
+  table { border-collapse: collapse; width: 100%; margin-top: .5rem; }
+  td, th { text-align: left; padding: .35rem .75rem; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: .85rem; }
+  .weight-strip { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+  .weight-strip > div { min-width: 130px; }
+  .weight-strip .te { font-size: 2.75rem; margin: 0; }
+  .w400 { font-weight: 400; }
+  .w500 { font-weight: 500; }
+  .w600 { font-weight: 600; }
+  .w700 { font-weight: 700; }
+  .w800 { font-weight: 800; }
+  code { font-family: 'SF Mono', Consolas, monospace; font-size: .9em; background: var(--sample-bg); padding: .1em .35em; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Baloo Tammudu 2 Vedic</h1>
+  <p>Prototype web font. Grafts Vedic marks (U+0951–U+0954 and U+1CD0–U+1CFF)
+     into Baloo Tammudu 2 for Telugu-script Sanskrit typesetting.</p>
+</header>
+
+<section>
+  <h2>Weights</h2>
+  <div class="weight-strip">
+    <div><div class="te w400">నమః</div><div class="label">400 Regular</div></div>
+    <div><div class="te w500">నమః</div><div class="label">500 Medium</div></div>
+    <div><div class="te w600">నమః</div><div class="label">600 SemiBold</div></div>
+    <div><div class="te w700">నమః</div><div class="label">700 Bold</div></div>
+    <div><div class="te w800">నమః</div><div class="label">800 ExtraBold</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Vedic accents on Telugu bases <small>the reason this font exists</small></h2>
+
+  <div class="sample">
+    <div class="te">నమో నమో॑ నమో᳚ నమః</div>
+    <div class="label">Plain / U+0951 udatta / U+1CDA double svarita / visarga</div>
+  </div>
+
+  <div class="sample">
+    <div class="te">క క॑ క᳚ కః</div>
+    <div class="label">Standalone consonant + various accents</div>
+  </div>
+
+  <div class="sample">
+    <div class="te">అగ్నిమీళే॑ పురో॑హితం</div>
+    <div class="label">Ṛgveda 1.1.1 opening, Telugu script</div>
+  </div>
+
+  <div class="sample">
+    <div class="te">సర్వే॑ భవన్తు॑ సుఖి॒నః</div>
+    <div class="label">Universal peace invocation (svara-marked)</div>
+  </div>
+
+  <div class="sample">
+    <div class="te">ఓం భూర్భువః᳚ స్వః</div>
+    <div class="label">Bhūrbhuvaḥ svaḥ with double svarita</div>
+  </div>
+</section>
+
+<section>
+  <h2>Coverage by codepoint <small>45 of 48 in Vedic Extensions + 4 Devanagari Vedic accents</small></h2>
+  <table>
+    <thead><tr><th>Range</th><th>Sample</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>U+0951</code></td><td class="te">క॑</td><td>Devanagari udatta</td></tr>
+      <tr><td><code>U+0952</code></td><td class="te">క॒</td><td>Devanagari anudatta (below-mark)</td></tr>
+      <tr><td><code>U+0953</code></td><td class="te">క॓</td><td>Devanagari grave</td></tr>
+      <tr><td><code>U+0954</code></td><td class="te">క॔</td><td>Devanagari acute</td></tr>
+      <tr><td><code>U+1CD0</code></td><td class="te">క᳐</td><td>Vedic karshana</td></tr>
+      <tr><td><code>U+1CDA</code></td><td class="te">క᳚</td><td>Vedic double svarita</td></tr>
+      <tr><td><code>U+1CDD</code></td><td class="te">క᳝</td><td>Vedic dot below</td></tr>
+      <tr><td><code>U+1CF4</code></td><td class="te">క᳴</td><td>Vedic candra above</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Base Telugu <small>unchanged from upstream Baloo Tammudu 2</small></h2>
+  <div class="sample">
+    <div class="te">తెలుగు అక్షరాలు: క ఖ గ ఘ ఙ చ ఛ జ ఝ ఞ ట ఠ డ ఢ ణ త థ ద ధ న ప ఫ బ భ మ య ర ల వ శ ష స హ ళ క్ష ఱ</div>
+  </div>
+  <div class="sample">
+    <div class="te">అ ఆ ఇ ఈ ఉ ఊ ఋ ౠ ఎ ఏ ఐ ఒ ఓ ఔ</div>
+  </div>
+</section>
+
+</body>
+</html>

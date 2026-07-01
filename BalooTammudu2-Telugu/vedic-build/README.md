@@ -47,7 +47,12 @@ BalooTammudu2-{Weight}.ttf  (cmap + glyf + GDEF wired)
   │
   │  add_vedic_gpos.py
   ▼
-BalooTammudu2-{Weight}.ttf  (+ abvm MarkBasePos lookup on tel2/telu)
+BalooTammudu2-{Weight}.ttf  (+ abvm/blwm MarkBasePos + mkmk MarkMarkPos)
+  │
+  │  prepare_webfont.py
+  ▼
+webfont/BalooTammudu2Vedic-{Weight}.ttf   (renamed family)
+webfont/BalooTammudu2Vedic-{Weight}.woff2 (compressed for web)
 ```
 
 ## Scripts in this directory
@@ -55,7 +60,8 @@ BalooTammudu2-{Weight}.ttf  (+ abvm MarkBasePos lookup on tel2/telu)
 | File | Purpose |
 |---|---|
 | `graft_vedic.py` | Copies Vedic glyph outlines from a donor TTF into a recipient TTF. Flattens composites, weight-matches, adapts glyph geometry: above-marks have their bbox-bottom aligned to Y=600 (Baloo's existing mark band); all marks have their bbox-center shifted to X=-300 to land over a typical Telugu base. Adds cmap entries, GDEF mark classification, sets zero advance. |
-| `add_vedic_gpos.py` | Adds a `MarkBasePos` (GPOS lookup type 4) connecting Vedic above-marks to Telugu consonants. Base anchors at consonant `(xmid, ymax + 220)`, mark anchors at `(xmid, ymin)`. Above-base vowel signs (matras U+0C3E–U+0C56) and halant are excluded from the base coverage so the mark attaches to the consonant directly — the matra is allowed to overlap visually but the mark sits over the consonant column. Registers a new `abvm` feature on the `tel2` and `telu` scripts. |
+| `add_vedic_gpos.py` | Adds three GPOS lookups: `abvm` (MarkBasePos, type 4) attaching above-marks to Telugu consonants at `(xmid, ymax + 220)`; `blwm` (MarkBasePos, type 4) attaching below-marks at `(xmid, ymin - 150)`; `mkmk` (MarkMarkPos, type 6) stacking above-marks on other above-marks. Above-base vowel signs and halant are excluded from `abvm` base coverage so marks sit over the consonant column rather than the matra hook. Wires new features onto the `tel2` and `telu` scripts. |
+| `prepare_webfont.py` | Renames each patched TTF to the derivative family "Baloo Tammudu 2 Vedic" (name IDs 1/2/3/4/6/16/17, OS/2 vendor ID, `head.fontRevision`, version note) and compresses each renamed TTF to WOFF2 for web use. Outputs to `webfont/`. |
 
 ## Donor font
 
@@ -101,9 +107,32 @@ foreach ($w in $weights) {
     --input  "BalooTammudu2-Telugu/vedic-build/BalooTammudu2-$w.ttf" `
     --output "BalooTammudu2-Telugu/vedic-build/BalooTammudu2-$w.ttf"
 }
+
+# 4. Rename to derivative family and emit WOFF2 for web distribution
+python BalooTammudu2-Telugu/vedic-build/prepare_webfont.py `
+  --input-dir  BalooTammudu2-Telugu/vedic-build `
+  --output-dir BalooTammudu2-Telugu/vedic-build/webfont
 ```
 
-Requires `fontTools` (`pip install fontTools`).
+Requires `fontTools` and `brotli` (`pip install fontTools brotli`).
+
+## Web font distribution (`webfont/`)
+
+`prepare_webfont.py` produces a Google-Fonts-style bundle in
+[`webfont/`](webfont/):
+
+- Five WOFF2 files (~160KB each) — one per weight (400/500/600/700/800).
+- Five TTF fallbacks for `format('truetype')` clients.
+- [`webfont/styles.css`](webfont/styles.css) — `@font-face` rules with
+  `font-display: swap` and `unicode-range` filtered to Latin + Telugu +
+  Vedic (U+0951–U+0954, U+0C00–U+0C7F, U+1CD0–U+1CFF).
+- [`webfont/demo.html`](webfont/demo.html) — visual smoke test.
+- [`webfont/README.md`](webfont/README.md) — hosting instructions.
+
+The renamed family is **"Baloo Tammudu 2 Vedic"** — distinct enough not to
+collide with the official Baloo Tammudu 2 shipped by EkType / Google
+Fonts, while making the lineage clear. All OFL copyright and license
+records (name IDs 0, 7, 13, 14) are preserved verbatim.
 
 ## Known limitations
 
@@ -116,10 +145,13 @@ the FontLab `.vfb` sources or the original designers.
 - **Approximate vertical clearance.** The static Y-gap of 220 units above
   each consonant works for most clusters, but tall above-base matras like
   `matraIi` (Y up to 1051) come within ~80 units of the marks. Tweak
-  `BASE_ANCHOR_Y_GAP` in `add_vedic_gpos.py` if more clearance is wanted.
-- **No anchors for below-marks.** Only the `abvm` (above-base) lookup was
-  added. U+0952 anudatta and the few below-marks in Vedic Extensions still
-  rely on the static negative-X-baked positioning from the graft step.
+  `BASE_ANCHOR_Y_GAP_ABOVE` in `add_vedic_gpos.py` if more clearance is
+  wanted.
+- **Matra clusters use consonant anchoring.** Rather than attaching to the
+  above-base matra (whose bbox center doesn't correlate with the consonant
+  it wraps), marks anchor to the preceding consonant with an elevated
+  Y-gap. This keeps marks horizontally over the consonant column but
+  leaves them visually close to tall matras.
 - **Coverage gaps.** Seven Vedic Extensions codepoints (U+1CF7, U+1CFA,
   U+1CFB–U+1CFF) aren't in the donor and remain unrendered.
 - **Sources still untouched.** Patches live in this directory only. The
@@ -142,26 +174,25 @@ existing build chain (VFB → AFDKO → TTF/TTX):
 - [ ] **Add entries to** `BalooTammudu2-Telugu/GlyphOrderAndAliasDB`
       mapping each new glyph name (`uni0951` … `uni1CFA`) to its
       codepoint, following the existing naming convention.
-- [ ] **Classify in** `BalooTammudu2-Telugu/GDEF` as combining marks
-      (class 3) with zero advance width.
-- [ ] **Real GPOS anchor design.** Replace the `add_vedic_gpos.py`
-      heuristic (consonants at `ymax + 220`, marks at `ymin`) with
-      anchors drawn intentionally in FontLab for each base and mark.
-      Add anchors for **below-marks too** (U+0952 anudatta etc.) — the
-      prototype only handles above-marks.
-- [ ] **Handle the above-base matras properly.** The prototype excludes
-      them from base coverage so the mark attaches to the consonant
-      instead. The right solution is either (a) `mkmk` anchors so the
-      Vedic mark attaches to the matra's top, or (b) contextual GPOS
-      that raises the mark when a matra is present in the cluster.
-- [ ] **Register `abvm` and `blwm` features** on `tel2`/`telu` script
-      records pointing at the new lookups, following Baloo's existing
-      feature-table structure rather than the runtime patch this
-      prototype does.
+- [x] **Classify in GDEF** as combining marks (class 3) with zero advance
+      width. *Prototype does this at the TTF level; needs to move to
+      `BalooTammudu2-Telugu/GDEF` for permanence.*
+- [x] **GPOS anchor coverage** for both above-marks (`abvm`) and below-
+      marks (`blwm`), plus `mkmk` for stacking above-marks on above-marks.
+      *Prototype adds these programmatically; anchors are heuristic and
+      need designer review in FontLab.*
+- [ ] **Contextual GPOS for above-base matra clusters.** The prototype
+      excludes above-matras from base coverage; a proper fix uses lookup
+      type 6 (contextual positioning) so the mark shifts up specifically
+      when a matra is present in the cluster.
+- [x] **Register `abvm`, `blwm`, `mkmk` features** on `tel2`/`telu`
+      scripts pointing at the new lookups. *Prototype does this at the
+      TTF level via runtime patching; should move to the source feature
+      tables for permanence.*
 - [ ] **Visual QA** across a Vedic test corpus (e.g. svaras over
       common Telugu consonants, conjuncts, and aksharas with above-base
-      matras). The static `BASE_ANCHOR_Y_GAP = 220` prototype value is
-      a compromise and needs designer review.
+      matras). The static gap values (`ABOVE=220`, `BELOW=150`) in the
+      prototype are compromises and need designer review.
 - [ ] **Remove this `vedic-build/` directory** once the proper sources
       ship — it's a temporary workspace, not a permanent build product.
 
@@ -172,6 +203,10 @@ Tracking issue: <https://github.com/EkType/Baloo2/issues> (filed as
 
 `donor/` (~45MB Noto release tree), `intermediate/` (compiled TTX), the
 ephemeral issue-draft files (`issue-body.md`, `issue-prefilled-url.txt`,
-`make_issue_url.py`), and `*.ttf` (handled by the repo-wide
-`.gitignore`). The 5 patched output TTFs are therefore not tracked —
-regenerate them with the pipeline above when needed.
+`make_issue_url.py`), and `*.ttf` / `*.woff2` (handled by the repo-wide
+`.gitignore`). The 5 patched output TTFs and the `webfont/` binaries are
+therefore not tracked — regenerate them with the pipeline above when
+needed.
+
+Tracked in `webfont/` alongside its regeneratable binaries: `styles.css`,
+`demo.html`, and `webfont/README.md`.
